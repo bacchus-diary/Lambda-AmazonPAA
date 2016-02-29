@@ -44,7 +44,7 @@ def signature(secret, endpoint, query):
     string = '&'.join(sorted(query.split('&')))
     url = urlparse(endpoint)
     tosign = '\n'.join(['GET', url.netloc, url.path, string])
-    logger.info("Signing %s: %s" % (secret, tosign))
+    logger.info("Signing: " + tosign)
 
     digest = hmac.new(key=secret.encode(), msg=tosign, digestmod=hashlib.sha256).digest()
     return urllib.quote_plus(base64.b64encode(digest))
