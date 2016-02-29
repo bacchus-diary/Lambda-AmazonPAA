@@ -21,13 +21,17 @@ def lambda_handler(event, context):
     return request(event['endpoint'], event['params'], settings(event['bucketName']))
 
 def request(endpoint, params, settings):
-    logger.info("Request to %s: %s" % (endpoint, str(params)))
+    def add(key, value):
+        if key not in params:
+            params[key] = value
 
-    params['Service'] = 'AWSECommerceService'
-    params['Version'] = '2013-08-01'
-    params['AWSAccessKeyId'] = settings['AWSAccessKeyId']
-    params['AssociateTag'] = settings['AssociateTag']
-    params['Timestamp'] = datetime.utcnow().isoformat()
+    add('Service', 'AWSECommerceService')
+    add('Version', '2013-08-01')
+    add('AWSAccessKeyId', settings['AWSAccessKeyId'])
+    add('AssociateTag', settings['AssociateTag'])
+    add('Timestamp', datetime.utcnow().isoformat())
+
+    logger.info("Request to %s: %s" % (endpoint, str(params)))
 
     query = joinQuery(params)
     sig = signature(settings['AWSSecretKey'], endpoint, query)
@@ -68,5 +72,5 @@ if __name__ == "__main__":
     filename = sys.argv[1]
     event = json.load(open(filename, 'r'))
 
-    res = request(event['endpoint'], event['params'], settings(event['bucketName']))
+    res = lambda_handler(event, None)
     print(res)
