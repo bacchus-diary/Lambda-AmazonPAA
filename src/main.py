@@ -29,7 +29,7 @@ def request(endpoint, params, settings):
     params['AssociateTag'] = settings['AssociateTag']
     params['Timestamp'] = datetime.utcnow().isoformat()
 
-    query = urllib.urlencode(params)
+    query = joinQuery(params)
     sig = signature(settings['AWSSecretKey'], endpoint, query)
     url = "%s?%s&Signature=%s" % (endpoint, query, sig)
 
@@ -40,6 +40,12 @@ def request(endpoint, params, settings):
     except urllib2.HTTPError as ex:
         logger.info("Error: " + str(ex))
         return '<error code="%s" reason="%s" />' % (ex.code, ex.reason)
+
+def joinQuery(params):
+    def quote(p):
+        (key, value) = p
+        return "%s=%s" % (urllib.quote(key), urllib.quote(value))
+    return '&'.join(map(quote, params.iteritems()))
 
 def signature(secret, endpoint, query):
     string = '&'.join(sorted(query.split('&')))
@@ -59,10 +65,8 @@ def settings(bucketName):
 if __name__ == "__main__":
     logging.basicConfig()
 
-    endpoint = sys.argv[1]
-    bucketName = sys.argv[2]
-    filename = sys.argv[3]
+    filename = sys.argv[1]
+    event = json.load(open(filename, 'r'))
 
-    params = json.load(open(filename, 'r'))
-    res = request(endpoint, params, settings(bucketName))
+    res = request(event['endpoint'], event['params'], settings(event['bucketName']))
     print(res)
