@@ -38,7 +38,7 @@ def request(endpoint, params, settings):
         res = urllib2.urlopen(url)
         return res.read()
     except urllib2.HTTPError as ex:
-        logger.info("Error: " + ex)
+        logger.info("Error: " + str(ex))
         return '<error code="%s" reason="%s" />' % (ex.code, ex.reason)
 
 def signature(secret, endpoint, query):
