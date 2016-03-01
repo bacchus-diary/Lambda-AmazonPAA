@@ -48,7 +48,7 @@ def request(endpoint, params, settings):
 def joinQuery(params):
     keys = sorted(params.keys())
     def quote(key):
-        return '='.join(map(urllib.quote, [key, params[key]]))
+        return '='.join(map(urllib.quote, [key, params[key].encode('utf-8')]))
     return '&'.join(map(quote, keys))
 
 def signature(secret, endpoint, query):
