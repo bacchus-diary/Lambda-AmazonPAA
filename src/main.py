@@ -15,7 +15,7 @@ from datetime import datetime
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-logger.info("Version 1.0.0")
+logger.info("Version 1.0.2")
 
 def lambda_handler(event, context):
     return request(event['endpoint'], event['params'], settings(event['bucketName']))
@@ -48,7 +48,7 @@ def request(endpoint, params, settings):
 def joinQuery(params):
     keys = sorted(params.keys())
     def quote(key):
-        return '='.join(map(urllib.quote, [key, params[key]]))
+        return '='.join(map(urllib.quote, [key, params[key].encode('utf-8')]))
     return '&'.join(map(quote, keys))
 
 def signature(secret, endpoint, query):
