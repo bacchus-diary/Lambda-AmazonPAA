@@ -46,15 +46,14 @@ def request(endpoint, params, settings):
         return '<error code="%s" reason="%s" />' % (ex.code, ex.reason)
 
 def joinQuery(params):
-    def quote(p):
-        (key, value) = p
-        return "%s=%s" % (urllib.quote(key), urllib.quote(value))
-    return '&'.join(map(quote, params.iteritems()))
+    keys = sorted(params.keys())
+    def quote(key):
+        return "%s=%s" % (urllib.quote(key), urllib.quote(params[key]))
+    return '&'.join(map(quote, keys))
 
 def signature(secret, endpoint, query):
-    string = '&'.join(sorted(query.split('&')))
     url = urlparse(endpoint)
-    tosign = '\n'.join(['GET', url.netloc, url.path, string])
+    tosign = '\n'.join(['GET', url.netloc, url.path, query])
     logger.info("Signing: " + tosign)
 
     digest = hmac.new(key=secret.encode(), msg=tosign, digestmod=hashlib.sha256).digest()
