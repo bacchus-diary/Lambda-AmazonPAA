@@ -15,7 +15,7 @@ from datetime import datetime
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-logger.info("Version 1.0.2")
+logger.info("Version 1.0.3")
 
 def lambda_handler(event, context):
     return request(event['endpoint'], event['params'], settings(event['bucketName']))
